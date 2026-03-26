@@ -438,7 +438,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
     }
   </style></head><body>
 
-  <!-- Mobile Header -->
   <div class="mobile-header">
     <div class="mobile-header-inner">
       <span class="mobile-logo">Corner IA</span>
@@ -447,7 +446,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
   </div>
 
   <div class="app-shell">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-logo">
         <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#7c3aed"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -493,7 +491,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
       </div>
     </aside>
 
-    <!-- MAIN -->
     <main class="main-content">
       <header class="main-header">
         <h1>Prova Virtual</h1>
@@ -510,7 +507,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
         <div id="statusBox" class="msg msg-success"></div>
 
         <div class="workspace">
-          <!-- LEFT: Generation Form -->
           <div>
             <div class="card" id="generateCard" ${!selectedModel ? 'style="display:none"' : ""}>
               <div class="card-header">
@@ -529,7 +525,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
                   <input type="hidden" name="model" id="selectedModelUrl" value="${escapeHtml(selectedModel?.imageUrl || '')}" />
                   <input type="hidden" name="_return" value="${escapeHtml(pathPrefix)}" />
 
-                  <!-- Upload garment (FIRST - most important) -->
                   <div class="section-group">
                     <div class="section-label">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -544,9 +539,22 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
                       <div class="upload-zone-hint drop-hint">JPG, PNG, WEBP &mdash; at&eacute; 12MB</div>
                       <img class="upload-preview" id="garmentPreview" alt="Preview" />
                     </div>
-                  </div>
+                    
+                    <div style="margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+                      <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+                        💡 Como enviar a foto da roupa
+                      </h4>
+                      <p style="font-size: 11px; color: #475569; margin: 0 0 10px 0; line-height: 1.4;">
+                        Para um resultado perfeito, a foto deve ser limpa. Evite fotos de pessoas vestindo a pe&ccedil;a (Lifestyle). Siga a ordem de qualidade:
+                      </p>
+                      <ul style="font-size: 11px; color: #475569; padding-left: 18px; margin: 0; line-height: 1.6;">
+                        <li><strong style="color: #10b981;">🌟 Flat Lay (Mais Recomendado):</strong> Roupa esticada sobre uma mesa ou ch&atilde;o liso. Mostra a estampa sem distor&ccedil;&otilde;es.</li>
+                        <li><strong>👻 Ghost Mannequin:</strong> Num manequim invis&iacute;vel (fundo apagado). D&aacute; volume 3D &agrave; pe&ccedil;a.</li>
+                        <li><strong>🧥 No Cabide:</strong> Pendurada reta num cabide simples contra uma parede lisa.</li>
+                      </ul>
+                    </div>
+                    </div>
 
-                  <!-- Pose -->
                   <div class="section-group">
                     <div class="section-label">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -565,7 +573,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
                     </div>
                   </div>
 
-                  <!-- Format + Accessories side by side -->
                   <div class="format-accessories-row">
                     <div>
                       <div class="section-label">
@@ -600,7 +607,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
               </div>
             </div>
 
-            <!-- No model selected CTA -->
             ${!selectedModel ? `
             <div class="card">
               <div class="card-body" style="text-align:center;padding:48px 24px">
@@ -610,7 +616,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
               </div>
             </div>` : ""}
 
-            <!-- GALLERY -->
             <div class="card">
               <div class="card-header">
                 <span class="card-title">
@@ -627,9 +632,7 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
             </div>
           </div>
 
-          <!-- RIGHT: Model Panel -->
           <div>
-            <!-- Active Model -->
             <div class="panel" id="activeModelCard">
               <div class="panel-header">
                 <span class="panel-title">Modelo Ativa</span>
@@ -651,7 +654,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
               </div>
             </div>
 
-            <!-- Models List -->
             <div class="panel" style="margin-top:16px" id="modelsCard">
               <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
                 <span class="panel-title">Suas Modelos</span>
@@ -697,7 +699,6 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
     </main>
   </div>
 
-  <!-- LOADING OVERLAY -->
   <div class="loading-overlay" id="loading">
     <div class="loading-card">
       <div class="spinner"></div>
@@ -750,6 +751,7 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
     });
   })();
   </script>
+  <script src="${FUNCTION_URL}?_resource=js"></script>
 </body></html>`;
 }
 
@@ -905,16 +907,32 @@ function cornerIaInit() {
     });
   }
 
+  /* --- NOVA FUNÇÃO DE FEEDBACK DE UPLOAD (ANIMAÇÃO + CHECK VERDE) --- */
   function showFilePreview(file) {
-    if (!preview || !file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      preview.src = ev.target.result;
-      preview.style.display = "block";
-      var texts = zone.querySelectorAll(".drop-icon, .drop-title, .drop-hint");
-      for (var i = 0; i < texts.length; i++) texts[i].style.display = "none";
-    };
-    reader.readAsDataURL(file);
+    if (!file) return;
+    var fileName = file.name;
+    
+    // Passo 1: Animação de "Lendo arquivo"
+    zone.innerHTML = '<div style="width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div><div style="font-size: 13px; color: #475569; font-weight: 600;">Lendo arquivo...</div>';
+    
+    // Passo 2: Mostra o Check Verde após 600ms
+    setTimeout(function() {
+      zone.innerHTML = '<div style="font-size: 36px; margin-bottom: 8px;">✅</div><div style="font-size: 15px; font-weight: 700; color: #10b981;">Upload Concluído!</div><div style="font-size: 12px; color: #64748b; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; padding: 0 10px;">' + fileName + '</div>';
+      
+      // Recoloca o input invisível por cima para não quebrar a lógica do formulário
+      fileInput.style.position = 'absolute';
+      fileInput.style.width = '100%';
+      fileInput.style.height = '100%';
+      fileInput.style.top = '0';
+      fileInput.style.left = '0';
+      fileInput.style.opacity = '0';
+      fileInput.style.cursor = 'pointer';
+      zone.appendChild(fileInput);
+      
+      zone.style.position = 'relative';
+      zone.style.borderColor = '#10b981';
+      zone.style.backgroundColor = '#ecfdf5';
+    }, 600);
   }
 
   /* --- Create Model form --- */
@@ -1044,9 +1062,20 @@ function cornerIaInit() {
             item.appendChild(img); item.appendChild(meta);
             galleryGrid.insertBefore(item, galleryGrid.firstChild);
           }
+          
+          // Reset visual do upload zone após a geração com sucesso
           if (fileInput) fileInput.value = "";
-          if (preview) { preview.style.display = "none"; preview.src = ""; }
-          if (zone) { var t = zone.querySelectorAll(".drop-icon, .drop-title, .drop-hint"); for (var i=0;i<t.length;i++) t[i].style.display = ""; }
+          if (zone) {
+             zone.style.borderColor = 'var(--border)';
+             zone.style.backgroundColor = '#fff';
+             zone.innerHTML = '<input type="file" name="garment" accept="image/*" id="garmentInput" required /><div class="upload-zone-icon drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="upload-zone-title drop-title">Arraste ou clique para enviar</div><div class="upload-zone-hint drop-hint">JPG, PNG, WEBP &mdash; at&eacute; 12MB</div>';
+             
+             // Re-bind listeners para o novo input criado
+             var newFileInput = document.getElementById("garmentInput");
+             newFileInput.addEventListener("change", function() {
+               if (newFileInput.files.length) showFilePreview(newFileInput.files[0]);
+             });
+          }
         })
         .catch(function(err) { stopLoadingAnimation(false); showError("Erro de rede: " + err.message); })
         .finally(function() { submitBtn.disabled = false; submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Gerar prova virtual'; });
