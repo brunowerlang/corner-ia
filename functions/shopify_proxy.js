@@ -755,6 +755,7 @@ function renderPage({ customerEmail = "Cliente", credits = 0, customerId = "", s
 </body></html>`;
 }
 
+
 /* =========================================
    CLIENT JAVASCRIPT
 ========================================= */
@@ -791,7 +792,7 @@ function cornerIaInit() {
     var steps = loadingSteps ? loadingSteps.querySelectorAll(".loading-step") : [];
     for (var i = 0; i < steps.length; i++) {
       steps[i].className = "loading-step";
-      steps[i].querySelector(".loading-step-icon").textContent = "\u23F3";
+      steps[i].querySelector(".loading-step-icon").textContent = "\\u23F3";
     }
     if (steps.length > 0) { steps[0].className = "loading-step active"; }
 
@@ -813,10 +814,10 @@ function cornerIaInit() {
       for (var i = 0; i < steps.length; i++) {
         if (i < to) {
           steps[i].className = "loading-step done";
-          steps[i].querySelector(".loading-step-icon").textContent = "\u2705";
+          steps[i].querySelector(".loading-step-icon").textContent = "\\u2705";
         } else if (i === to) {
           steps[i].className = "loading-step active";
-          steps[i].querySelector(".loading-step-icon").textContent = "\u23F3";
+          steps[i].querySelector(".loading-step-icon").textContent = "\\u23F3";
         } else {
           steps[i].className = "loading-step";
         }
@@ -844,7 +845,7 @@ function cornerIaInit() {
         var steps = loadingSteps ? loadingSteps.querySelectorAll(".loading-step") : [];
         for (var i = 0; i < steps.length; i++) {
           steps[i].className = "loading-step done";
-          steps[i].querySelector(".loading-step-icon").textContent = "\u2705";
+          steps[i].querySelector(".loading-step-icon").textContent = "\\u2705";
         }
         setTimeout(function() { loading.classList.remove("active"); }, 1200);
       } else {
@@ -873,13 +874,13 @@ function cornerIaInit() {
     if (cm) cm.textContent = n;
   }
 
-  /* Safe fetch helper: handles non-JSON responses gracefully */
+  /* Safe fetch helper */
   function safeFetch(url, opts) {
     return fetch(url, opts).then(function(r) {
       var ct = r.headers.get("content-type") || "";
       if (ct.indexOf("application/json") === -1) {
         return r.text().then(function(txt) {
-          return { ok: false, data: { error: "Resposta inesperada do servidor (status " + r.status + "). Tente recarregar a pagina." } };
+          return { ok: false, data: { error: "Resposta inesperada do servidor (status " + r.status + ")." } };
         });
       }
       return r.json().then(function(d) { return { ok: r.ok, data: d }; });
@@ -907,32 +908,51 @@ function cornerIaInit() {
     });
   }
 
-  /* --- NOVA FUNÇÃO DE FEEDBACK DE UPLOAD (ANIMAÇÃO + CHECK VERDE) --- */
+  /* --- FEEDBACK DE UPLOAD CORRIGIDO (Animação + Imagem + Check Verde) --- */
   function showFilePreview(file) {
-    if (!file) return;
+    if (!preview || !file) return;
     var fileName = file.name;
     
-    // Passo 1: Animação de "Lendo arquivo"
-    zone.innerHTML = '<div style="width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div><div style="font-size: 13px; color: #475569; font-weight: 600;">Lendo arquivo...</div>';
+    // Esconde os textos originais com segurança
+    var texts = zone.querySelectorAll(".drop-icon, .drop-title, .drop-hint");
+    for (var i = 0; i < texts.length; i++) texts[i].style.display = "none";
     
-    // Passo 2: Mostra o Check Verde após 600ms
-    setTimeout(function() {
-      zone.innerHTML = '<div style="font-size: 36px; margin-bottom: 8px;">✅</div><div style="font-size: 15px; font-weight: 700; color: #10b981;">Upload Concluído!</div><div style="font-size: 12px; color: #64748b; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; padding: 0 10px;">' + fileName + '</div>';
-      
-      // Recoloca o input invisível por cima para não quebrar a lógica do formulário
-      fileInput.style.position = 'absolute';
-      fileInput.style.width = '100%';
-      fileInput.style.height = '100%';
-      fileInput.style.top = '0';
-      fileInput.style.left = '0';
-      fileInput.style.opacity = '0';
-      fileInput.style.cursor = 'pointer';
-      zone.appendChild(fileInput);
-      
-      zone.style.position = 'relative';
-      zone.style.borderColor = '#10b981';
-      zone.style.backgroundColor = '#ecfdf5';
-    }, 600);
+    // Adiciona o Spinner Temporário (sem destruir o input)
+    var tempLoading = document.createElement("div");
+    tempLoading.id = "tempLoading";
+    tempLoading.innerHTML = '<div style="width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div><div style="font-size: 13px; color: #475569; font-weight: 600;">Lendo arquivo...</div>';
+    zone.appendChild(tempLoading);
+
+    // Usa o FileReader para mostrar a miniatura real da foto enviada
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      setTimeout(function() {
+        var tl = document.getElementById("tempLoading");
+        if (tl) tl.remove();
+
+        // Mostra a imagem
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+        preview.style.marginTop = "0";
+
+        // Estiliza o fundo de verde
+        zone.style.borderColor = '#10b981';
+        zone.style.backgroundColor = '#ecfdf5';
+
+        // Cria a etiqueta de Sucesso Verde
+        var existingBadge = document.getElementById('successBadge');
+        if(!existingBadge) {
+          var badge = document.createElement('div');
+          badge.id = 'successBadge';
+          badge.innerHTML = '✅ Upload Concluído!<br><span style="font-size:11px; font-weight:normal;">' + fileName + '</span>';
+          badge.style.cssText = 'font-size: 14px; font-weight: 700; color: #10b981; margin-top: 12px; padding: 8px 12px; background: #d1fae5; border-radius: 8px; display: inline-block; width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+          zone.appendChild(badge);
+        } else {
+          existingBadge.innerHTML = '✅ Upload Concluído!<br><span style="font-size:11px; font-weight:normal;">' + fileName + '</span>';
+        }
+      }, 500); // pequeno delay para a animação aparecer
+    };
+    reader.readAsDataURL(file);
   }
 
   /* --- Create Model form --- */
@@ -1000,7 +1020,7 @@ function cornerIaInit() {
       .catch(function(err) { showError("Erro de rede: " + err.message); });
   }
 
-  /* --- Bind model card buttons (event delegation) --- */
+  /* --- Bind model card buttons --- */
   document.addEventListener("click", function(e) {
     var selBtn = e.target.closest ? e.target.closest(".mc-select") : null;
     if (selBtn) {
@@ -1063,18 +1083,16 @@ function cornerIaInit() {
             galleryGrid.insertBefore(item, galleryGrid.firstChild);
           }
           
-          // Reset visual do upload zone após a geração com sucesso
+          // Reseta a caixa de upload para o estado original
           if (fileInput) fileInput.value = "";
+          if (preview) { preview.style.display = "none"; preview.src = ""; }
           if (zone) {
              zone.style.borderColor = 'var(--border)';
              zone.style.backgroundColor = '#fff';
-             zone.innerHTML = '<input type="file" name="garment" accept="image/*" id="garmentInput" required /><div class="upload-zone-icon drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="upload-zone-title drop-title">Arraste ou clique para enviar</div><div class="upload-zone-hint drop-hint">JPG, PNG, WEBP &mdash; at&eacute; 12MB</div>';
-             
-             // Re-bind listeners para o novo input criado
-             var newFileInput = document.getElementById("garmentInput");
-             newFileInput.addEventListener("change", function() {
-               if (newFileInput.files.length) showFilePreview(newFileInput.files[0]);
-             });
+             var t = zone.querySelectorAll(".drop-icon, .drop-title, .drop-hint");
+             for (var i=0;i<t.length;i++) t[i].style.display = "";
+             var b = document.getElementById('successBadge');
+             if (b) b.remove();
           }
         })
         .catch(function(err) { stopLoadingAnimation(false); showError("Erro de rede: " + err.message); })
