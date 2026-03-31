@@ -11,8 +11,8 @@ const FORMAT_PRESETS = {
 };
 
 /**
- * Optimizes an image buffer: resizes to target format, converts to WebP,
- * and compresses to stay under MAX_SIZE_BYTES.
+ * Optimizes an image buffer: resizes to target format with safety padding,
+ * converts to WebP, and compresses to stay under MAX_SIZE_BYTES.
  *
  * @param {Buffer} inputBuffer - Raw image buffer (PNG, JPEG, etc.)
  * @param {object} [options]
@@ -23,29 +23,46 @@ async function optimizeImage(inputBuffer, options = {}) {
   const preset = FORMAT_PRESETS[options.format] || FORMAT_PRESETS.vertical;
   let quality = WEBP_QUALITY;
 
+  // Define uma margem de segurança de 15% para não cortar cabeça/pés
+  const PADDING_FACTOR = 0.85; 
+  const innerWidth = Math.floor(preset.width * PADDING_FACTOR);
+  const innerHeight = Math.floor(preset.height * PADDING_FACTOR);
+  
+  const padX = Math.floor((preset.width - innerWidth) / 2);
+  const padY = Math.floor((preset.height - innerHeight) / 2);
+  
+  const padBottom = preset.height - innerHeight - padY;
+  const padRight = preset.width - innerWidth - padX;
 
-  let result = await sharp(inputBuffer)
-    .resize({
-      width: preset.width,
-      height: preset.height,
-      fit: "cover", // Crop to fill the frame, no borders
-      position: sharp.strategy.entropy // Focus crop on the most "interesting" part (usually the subject)
-    })
-    .webp({ quality })
-    .toBuffer();
+  // Fundo transparente para a margem
+  const bgConfig = { r: 255, g: 255, b: 255, alpha: 0 };
 
-  // If still too large, reduce quality iteratively
+  // Função encapsulada para o Sharp para facilitar a iteração de qualidade
+  const processImage = async (q) => {
+    return await sharp(inputBuffer)
+      .resize({
+        width: innerWidth,
+        height: innerHeight,
+        fit: "contain", // Mantém a proporção inteira dentro do espaço menor
+        background: bgConfig
+      })
+      .extend({
+        top: padY,
+        bottom: padBottom,
+        left: padX,
+        right: padRight,
+        background: bgConfig // Adiciona o padding real no tamanho final do preset
+      })
+      .webp({ quality: q })
+      .toBuffer();
+  };
+
+  let result = await processImage(quality);
+
+  // Se ainda estiver muito grande, reduz a qualidade gradativamente
   while (result.length > MAX_SIZE_BYTES && quality > 40) {
     quality -= 8;
-    result = await sharp(inputBuffer)
-      .resize({
-        width: preset.width,
-        height: preset.height,
-        fit: "cover",
-        position: sharp.strategy.entropy
-      })
-      .webp({ quality })
-      .toBuffer();
+    result = await processImage(quality);
   }
 
   return { buffer: result, mimeType: "image/webp" };
